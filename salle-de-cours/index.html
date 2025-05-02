@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Salle de cours | Institut des Sciences Islamiques</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-xl font-semibold text-gray-800">Institut des Sciences Islamiques</h1>
+    <nav>
+      <a href="/" class="text-gray-600 hover:text-blue-600 mx-2">Accueil</a>
+      <a href="/about" class="text-gray-600 hover:text-blue-600 mx-2">About</a>
+    </nav>
+  </header>
+
+  <main class="flex-grow container mx-auto p-6 max-w-md">
+    <h2 class="text-2xl font-bold mb-4">Salle de cours</h2>
+    <p class="mb-6 text-gray-700">Le site que vous visitez actuellement est en cours de développement. Son contenu n'est donc pas complet.</p>
+    <img src="/images/history-img.png" alt="history" class="mb-6 rounded shadow" />
+    <h3 class="text-lg font-semibold mb-2">Rentrée 2019-2020</h3>
+    <p class="mb-4 font-semibold">Disposition de salle de cours</p>
+    <p class="mb-6">Ce nouveau service vous permettra de retrouver votre salle</p>
+
+    <form id="matriculeForm" class="space-y-4">
+      <label for="matricule" class="block text-gray-700 font-medium">Saisissez votre matricule</label>
+      <input
+        type="text"
+        id="matricule"
+        name="matricule"
+        required
+        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Entrez votre matricule"
+      />
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
+      >
+        Valider
+      </button>
+    </form>
+
+    <div id="result" class="mt-6 text-center text-lg font-semibold text-gray-800"></div>
+  </main>
+
+  <footer class="bg-white shadow p-4 text-center text-gray-600 text-sm">
+    &copy; 2024 Institut des Sciences Islamiques
+  </footer>
+
+  <script>
+    const form = document.getElementById('matriculeForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultDiv.textContent = '';
+      const matricule = form.matricule.value.trim();
+      if (!matricule) {
+        resultDiv.textContent = 'Veuillez saisir un matricule.';
+        return;
+      }
+      try {
+        const response = await fetch('http://localhost:3000/api/salle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ matricule }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          resultDiv.textContent = `Votre salle est : ${data.salle}`;
+          resultDiv.classList.remove('text-red-600');
+          resultDiv.classList.add('text-green-700');
+        } else {
+          resultDiv.textContent = data.error || 'Erreur inconnue';
+          resultDiv.classList.remove('text-green-700');
+          resultDiv.classList.add('text-red-600');
+        }
+      } catch (error) {
+        resultDiv.textContent = 'Erreur de connexion au serveur.';
+        resultDiv.classList.remove('text-green-700');
+        resultDiv.classList.add('text-red-600');
+      }
+    });
+  </script>
+</body>
+</html>
